@@ -1,5 +1,7 @@
 # DSK for MSX
 
+- https://code4fukui.github.io/DSK/
+
 ## usage
 
 ### decode dsk file
@@ -13,6 +15,7 @@ deno -A https://code4fukui.github.io/DSK/dskdecoder.js sample.dsk
 ```sh
 deno -A https://code4fukui.github.io/DSK/dskencoder.js hello.dsk AUTOEXEC.BAS
 ```
+→ [bas2dsk](https://code4fukui.github.io/DSK/) - make a simple dsk file with AUTOEXEC.BAS
 
 ## memo
 

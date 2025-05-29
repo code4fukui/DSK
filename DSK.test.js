@@ -3,6 +3,7 @@ import { DSK } from "./DSK.js";
 
 Deno.test("simple", async () => {
   const fn = "sample.dsk";
+  //const fn = "big.dsk";
   const bin = await Deno.readFile(fn);
   const files = DSK.decode(bin);
   //console.log(files, files.length);

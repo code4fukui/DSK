@@ -7,7 +7,8 @@ export const decode = (dsk) => {
   if (sectorsize != N_SECTOR) throw new Error("sector size is not " + N_SECTO + ": " + sectorsize);
   const nroot = bin2short(dsk, 0x11, true);
   const nfat = bin2short(dsk, 0x16, true);
-  //console.log("nroot", nroot, "nfat", nfat);
+  const csize = dsk[0x0d] * sectorsize;
+  //console.log("nroot", nroot, "nfat", nfat, "csize", csize);
   const nrootsector = nroot / (sectorsize / 32);
     
   // decode FAT12
@@ -20,8 +21,8 @@ export const decode = (dsk) => {
       const b3 = dsk[idx++];
       const n1 = b1 | ((b2 & 0xf) << 8);
       const n2 = (b2 >> 4) | (b3 << 4);
-      fat.push(n1.toString(16));
-      fat.push(n2.toString(16));
+      fat.push(n1);
+      fat.push(n2);
     }
   }
   //console.log(fat);
@@ -35,23 +36,24 @@ export const decode = (dsk) => {
     const att = dsk[proot + 0xb];
     const ifat = bin2short(dsk, proot + 0x1a, true);
     const size = bin2i(dsk, proot + 0x1c, true);
-    //console.log(fn, "att", att, "ifat", ifat, "size", size);
     if (fn == ".") continue;
+    //console.log(fn, "att", att, "ifat", ifat, "size", size);
 
     const data = new Uint8Array(size);
     let idx = 0;
     let curfat = ifat;
     let rem = size;
     for (;;) {
-      const len = Math.min(sectorsize, rem);
-      const off = (1 + nfat * 2 + nrootsector + (curfat - 2)) * sectorsize;
+      const len = Math.min(csize, rem);
+      const off = (1 + nfat * 2 + nrootsector) * sectorsize + (curfat - 2) * csize;
+      //console.log(fn, curfat, rem);
       //console.log("off", off.toString(16), dsk[off])
       for (let i = 0; i < len; i++) {
         data[idx++] = dsk[off + i];
       }
       rem -= len;
       if (!rem) break;
-      curfat = fat[curfat - 2];
+      curfat = fat[curfat];
       if (curfat >= 0xff8) throw new Error("file error");
     }
     const file = {

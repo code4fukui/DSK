@@ -6,17 +6,23 @@
 deno -A https://code4fukui.github.io/DSK/dskdecoder.js sample.dsk
 ```
 
-
 ## memo
 
 ```
 // 2 sides * 80 tracks * 9 sectors per track * 512 bytes per sector = 737280 Bytes (720kB)
 
-0	ブートセクタ	BPB（BIOS Parameter Block）含む
-1–9	FAT1	通常9セクタ
-10–18	FAT2	通常9セクタ（FAT1のコピー）
-19–32	ルートディレクトリ領域	14セクタ×16エントリ/セクタ
-33以降	データ領域	実データ（クラスタ単位）
+BIOS Parameter Block（BPB）の例（ブートセクタ）
+オフセット	内容	値（例）
+0x0B	セクタサイズ	512
+0x0D	セクタ/クラスタ数	2 = 1024byte
+0x0E	予約セクタ数	1
+0x10	FATの数	2
+0x11	ルートディレクトリエントリ数	112
+0x13	総セクタ数	720*1024/512 = 1440
+0x16	FATのセクタ数	3
+0x18	セクタ/トラック数	9
+0x1A	ヘッド数（面数）	2
+0x1C	隠しセクタ数	0
 
 ルートディレクトリエントリ（1エントリ＝32バイト）
 オフセット	内容	備考
@@ -27,21 +33,9 @@ deno -A https://code4fukui.github.io/DSK/dskdecoder.js sample.dsk
 0x1C	ファイルサイズ（4B）	バイト単位
 
 sector
-0 BOOT
-1 FAT1
-2 FAT1
-3 FAT1
-4 FAT2
-5 FAT2
-6 FAT2
-7 ROOT
-8
-9
-10
-11
-12
-13
-14 DATA
-
-0xe00 データ領域
+0	ブートセクタ	BPB（BIOS Parameter Block）含む
+1–3	FAT1  3セクタ
+4–6	FAT2  3セクタ（FAT1のコピー）
+7–13	ルートディレクトリ領域	7セクタ×16エントリ
+14以降	データ領域	実データ（クラスタ単位 = 1024byte）
 ```
